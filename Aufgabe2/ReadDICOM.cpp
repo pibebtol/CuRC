@@ -67,6 +67,7 @@ int main(int argc, char* argv[])
             ++seriesItr;
         }
 
+        int itr = 0;
         //Iterate over all found series
         for (seriesItr = seriesUID.begin(); seriesItr != seriesUID.end(); seriesItr++)
         {
@@ -99,40 +100,51 @@ int main(int argc, char* argv[])
             
             //Access voxels
             short* voxels = image->GetBufferPointer();
-            int slice = 100;//Select slice
+            int slice = index;//Select slice
             short vMax = -1000;
             short vMin = 3000;
 
-            int scaleValue = (maxValue + 1024)/255;
+            float window = (maxValue - minValue);
+
+            std::cout << window << std::endl;                        
+                        
+            //int scaleValue = (maxValue + 1280)/255;
             //Iterate over slice
+            //if ()
             for (int x = 0;x < size[0];x++) {
                 for (int y = 0;y < size[1];y++) {
+                    // get value out of voxel
                     int offset = x + y*size[1] + slice*size[0]*size[1];
                     short val = voxels[offset];
-
                     vMax = max(vMax,val);
                     vMin = min(vMin,val);
                     
+                    // hounsfield window
                     if (val < minValue) {
                         val = 0;
                     } else if (val > maxValue) {
                         val = 0;
                     } else {
-                        val = (val + 1024) / scaleValue;
+                        val = ((val - minValue) / window) * 255;
                     }
 
-                    //std::cout << "test" << std::endl;
+                    //std::cout <<  << std::endl;
 
-                    if (val > 255)
+                    // safety belt (only values between 0 and 255 allowed)
+                    if (val > 255) {
+                        //std::cout << "testhigh" << std::endl;
                         val = 255;
-                    else if (val < 0)
+                    } else if (val < 0) {
+                        //std::cout << "testlow" << std::endl;
                         val = 0;
+                    }
                     output.at<unsigned char>(y,x) = val;
                 }
             }
-            std::cout << scaleValue << std::endl;
+
+            //std::cout << scaleValue << std::endl;
             printf("%d,%d\n",vMin,vMax);
-            imwrite("out.png",output);//Write slice to file            
+            imwrite("out.png", output);//Write slice to file            
         }
     }
     catch (itk::ExceptionObject &ex)
