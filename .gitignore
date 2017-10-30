@@ -31,9 +31,16 @@
 *.out
 *.app
 
-#
+# Bilder, Pdf, Archive
 *.pdf
 *.tar
 *.zip
 .vscode
 build
+bilder
+myWay
+evoles
+*.jpg
+*.png
+*.txt
+PATIENT_DICOM
