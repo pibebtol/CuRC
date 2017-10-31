@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
             std::cout << size << std::endl;
             
             //Allocate OpenCV image
-            Mat output(size[0], size[1], CV_8U);
+            Mat output;
             
             //Access voxels
             short* voxels = image->GetBufferPointer();
@@ -110,35 +110,77 @@ int main(int argc, char* argv[])
                         
             //int scaleValue = (maxValue + 1280)/255;
             //Iterate over slice
-            //if ()
-            for (int x = 0;x < size[0];x++) {
-                for (int y = 0;y < size[1];y++) {
-                    // get value out of voxel
-                    int offset = x + y*size[1] + slice*size[0]*size[1];
-                    short val = voxels[offset];
-                    vMax = max(vMax,val);
-                    vMin = min(vMin,val);
+            if (view == 0) {
+                output = Mat(size[0], size[1], CV_8U);
+                for (int x = 0;x < size[0];x++) {
+                    for (int y = 0;y < size[1];y++) {
+                        // get value out of voxel
+                        int offset = x + y*size[1] + slice*size[0]*size[1];
+                        short val = voxels[offset];
+                        vMax = max(vMax,val);
+                        vMin = min(vMin,val);
                     
-                    // hounsfield window
-                    if (val < minValue) {
-                        val = 0;
-                    } else if (val > maxValue) {
-                        val = 0;
-                    } else {
-                        val = ((val - minValue) / window) * 255;
-                    }
+                        // hounsfield window
+                        if (val < minValue) {
+                            val = 0;
+                        } else if (val > maxValue) {
+                            val = 0;
+                        } else {
+                            val = ((val - minValue) / window) * 255;
+                        }
 
-                    //std::cout <<  << std::endl;
+                        //std::cout <<  << std::endl;
 
-                    // safety belt (only values between 0 and 255 allowed)
-                    if (val > 255) {
-                        //std::cout << "testhigh" << std::endl;
-                        val = 255;
-                    } else if (val < 0) {
-                        //std::cout << "testlow" << std::endl;
-                        val = 0;
+                        output.at<unsigned char>(y,x) = val;
                     }
-                    output.at<unsigned char>(y,x) = val;
+                }
+            } else if (view > 0) {
+                output = Mat(size[2], size[0], CV_8U);
+                for (int x = 0;x < size[0];x++) {
+                    for (int y = 0;y < size[2];y++) {
+                        // get value out of voxel
+                        int offset = x + y*size[0]*size[1] + slice*size[0];
+                        short val = voxels[offset];
+                        vMax = max(vMax,val);
+                        vMin = min(vMin,val);
+                    
+                        // hounsfield window
+                        if (val < minValue) {
+                            val = 0;
+                        } else if (val > maxValue) {
+                            val = 0;
+                        } else {
+                            val = ((val - minValue) / window) * 255;
+                        }
+
+                        //std::cout << x << " " << y << std::endl;
+
+                        output.at<unsigned char>(y,x) = val;
+                    }
+                }
+            } else {
+                output = Mat(size[2], size[0], CV_8U);
+                for (int x = 0;x < size[2];x++) {
+                    for (int y = 0;y < size[0];y++) {
+                        // get value out of voxel
+                        int offset = x*size[0]*size[1] + y*size[1] + slice;
+                        short val = voxels[offset];
+                        vMax = max(vMax,val);
+                        vMin = min(vMin,val);
+                    
+                        // hounsfield window
+                        if (val < minValue) {
+                            val = 0;
+                        } else if (val > maxValue) {
+                            val = 0;
+                        } else {
+                            val = ((val - minValue) / window) * 255;
+                        }
+
+                        //std::cout << x << " " << y << std::endl;
+
+                        output.at<unsigned char>(x,y) = val;
+                    }
                 }
             }
 
