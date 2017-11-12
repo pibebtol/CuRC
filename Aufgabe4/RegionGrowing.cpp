@@ -15,32 +15,33 @@ void ReadPoints(const char* file,std::vector<Point2i>& seeds)
     fclose(f);
 }
 //RegionGrowing
-void RG(Mat & image, Mat & is_visited, const Point2i& currentValue, unsigned char greyscale, int threshold)
+void RG(Mat & image, Mat & is_visited, const Point2i& currentValue, unsigned char greyscale, int threshold, unsigned char orig_value)
 {
     int x = currentValue.x;
     int y = currentValue.y;
     // set value to visited in matrix
     is_visited.at<unsigned char>(y, x) = 255;
-    // calculate difference
+    // calculate difference to current and to startseed value
     int dif = std::abs(image.at<unsigned char>(y, x) - greyscale);
-    // 
-    if (dif < threshold) {
+    int orig_dif = std::abs(image.at<unsigned char>(y, x) - orig_value);
+    // only check next nodes, if threshold holds
+    if (dif < threshold && orig_dif < 10) {
         // visit neighbors (if they exist) and (if they were not visited yet)
         if (x > 0 && is_visited.at<unsigned char>(y, x-1) == 0) {
             // recursive calling of RG
-            RG(image, is_visited, Point2i(x-1, y), image.at<unsigned char>(y, x), threshold);
+            RG(image, is_visited, Point2i(x-1, y), image.at<unsigned char>(y, x), threshold, orig_value);
         }
         if (y > 0 && is_visited.at<unsigned char>(y-1, x) == 0) {
             // recursive calling of RG
-            RG(image, is_visited, Point2i(x, y-1), image.at<unsigned char>(y, x), threshold);
+            RG(image, is_visited, Point2i(x, y-1), image.at<unsigned char>(y, x), threshold, orig_value);
         }
         if (x < (image.cols - 1) && is_visited.at<unsigned char>(y, x+1) == 0) {
             // recursive calling of RG
-            RG(image, is_visited, Point2i(x+1, y), image.at<unsigned char>(y, x), threshold);
+            RG(image, is_visited, Point2i(x+1, y), image.at<unsigned char>(y, x), threshold, orig_value);
         }
         if (y < (image.rows - 1) && is_visited.at<unsigned char>(y+1, x) == 0) {
             // recursive calling of RG
-            RG(image, is_visited, Point2i(x, y+1), image.at<unsigned char>(y, x), threshold);
+            RG(image, is_visited, Point2i(x, y+1), image.at<unsigned char>(y, x), threshold, orig_value);
         }
         // set value to white in original
         image.at<unsigned char>(y, x) = 255;
@@ -68,7 +69,7 @@ int main(int argc, char** argv )
         int x = seeds[i].x;
         int y = seeds[i].y;
         printf("%d %d\n", x, y);
-        RG(image, is_visited, Point2i(x, y), image.at<unsigned char>(y, x), atoi(argv[4]));
+        RG(image, is_visited, Point2i(x, y), image.at<unsigned char>(y, x), atoi(argv[4]), image.at<unsigned char>(y, x));
     }
     
     // write image
