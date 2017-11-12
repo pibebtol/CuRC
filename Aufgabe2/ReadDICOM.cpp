@@ -105,12 +105,10 @@ int main(int argc, char* argv[])
             short vMin = 3000;
 
             float window = (maxValue - minValue);
-
-            std::cout << window << std::endl;                        
                         
-            //int scaleValue = (maxValue + 1280)/255;
             //Iterate over slice
             if (view == 0) {
+                // transversal view
                 output = Mat(size[0], size[1], CV_8U);
                 for (int x = 0;x < size[0];x++) {
                     for (int y = 0;y < size[1];y++) {
@@ -129,12 +127,11 @@ int main(int argc, char* argv[])
                             val = ((val - minValue) / window) * 255;
                         }
 
-                        //std::cout <<  << std::endl;
-
                         output.at<unsigned char>(y,x) = val;
                     }
                 }
             } else if (view > 0) {
+                // frontal view
                 output = Mat(size[2], size[0], CV_8U);
                 for (int x = 0;x < size[0];x++) {
                     for (int y = 0;y < size[2];y++) {
@@ -153,12 +150,11 @@ int main(int argc, char* argv[])
                             val = ((val - minValue) / window) * 255;
                         }
 
-                        //std::cout << x << " " << y << std::endl;
-
                         output.at<unsigned char>(y,x) = val;
                     }
                 }
             } else {
+                // sagital view
                 output = Mat(size[2], size[0], CV_8U);
                 for (int x = 0;x < size[2];x++) {
                     for (int y = 0;y < size[0];y++) {
@@ -176,8 +172,6 @@ int main(int argc, char* argv[])
                         } else {
                             val = ((val - minValue) / window) * 255;
                         }
-
-                        //std::cout << x << " " << y << std::endl;
 
                         output.at<unsigned char>(x,y) = val;
                     }
