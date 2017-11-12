@@ -48,7 +48,7 @@ void RG(Mat & image, Mat & is_visited, const Point2i& currentValue, unsigned cha
 }
 int main(int argc, char** argv )
 {
-    if ( argc < 3 )
+    if ( argc < 5 )
     {
         printf("usage: RegionGrowing <image> <output image> <Seed file> <threshold>\n");
         return -1;
@@ -60,17 +60,17 @@ int main(int argc, char** argv )
     // read in seeds
     std::vector<Point2i> seeds;
     ReadPoints(argv[3],seeds);
-    // set output mat to zeros
-    Mat output = Mat::zeros(image.size(),CV_8U);
+    // set is_visited mat to zeros
+    Mat is_visited = Mat::zeros(image.size(),CV_8U);
 
-    // Region Growing
+    // Region Growing for all seeds
     for (size_t i = 0;i < seeds.size();i++) {
         int x = seeds[i].x;
         int y = seeds[i].y;
         printf("%d %d\n", x, y);
-        output.at<unsigned char>(y, x) = 1;
-        RG(image, output, Point2i(x, y), image.at<unsigned char>(y, x), atoi(argv[4]));
+        RG(image, is_visited, Point2i(x, y), image.at<unsigned char>(y, x), atoi(argv[4]));
     }
     
+    // write image
     imwrite(argv[2], image);
 }
