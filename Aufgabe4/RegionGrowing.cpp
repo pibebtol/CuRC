@@ -25,7 +25,7 @@ void RG(Mat & image, Mat & is_visited, const Point2i& currentValue, unsigned cha
     int dif = std::abs(image.at<unsigned char>(y, x) - greyscale);
     int orig_dif = std::abs(image.at<unsigned char>(y, x) - orig_value);
     // only check next nodes, if threshold holds
-    if (dif < threshold && orig_dif < 10) {
+    if (dif < threshold && orig_dif < 26) {
         // visit neighbors (if they exist) and (if they were not visited yet)
         if (x > 0 && is_visited.at<unsigned char>(y, x-1) == 0) {
             // recursive calling of RG
