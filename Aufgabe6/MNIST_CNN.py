@@ -25,7 +25,7 @@ width = X.shape[3] #28 Bei MNIST
 batch_size = 50 #Batchgroesse 
 num_iterations = 100 #Anzahl Iterationen
 
-conv1_size = 5 #Größe kernel hidden layer
+conv1_size = 5 #Groesse kernel hidden layer
 conv1_filter = 20 #Anzahl Filter hidden layer
 out_size = 10 # Anzahl Klassen
 

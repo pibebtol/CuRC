@@ -43,3 +43,8 @@ evoles
 *.jpg
 *.png
 PATIENT_DICOM
+
+# data
+*.stl
+*.gz
+*.pyc

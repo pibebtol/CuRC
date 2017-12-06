@@ -25,7 +25,7 @@ width = X.shape[3] #28 Bei MNIST
 batch_size = 50 #Batchgroesse 
 num_iterations = 100 #Anzahl Iterationen
 
-fc1_size = 15 #Größe hidden layer
+fc1_size = 15 #Groesse hidden layer
 out_size = 10 # Anzahl Klassen
 
 input_var = T.tensor4('inputs') #Eingabe ist 4D: N Trainingsbeispiele, 1 Kanal, Hoehe, Breite
