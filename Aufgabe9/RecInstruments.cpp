@@ -10,32 +10,44 @@ using boost::format;
 bool train(string sample_fnames, string sample_fnames_shape,
 		int K, int NumSamples, string dimensions, string out_em_fname);
 bool classify(string em_file, string classification_files);
+
+string usage_train = "RecInstruments train <sample_folder> <sample_folder_shapes> <K> <NumSamples> <Dimensions> <out_em_fname>";
+string usage_classify = "RecInstruments classify <sample_folder> <K> <Dimensions> <out>";
+
 int main(int argc, char** argv )
 {
 	if ( argc >= 2){
 		string command = argv[1];
-		if (command.compare("train")) {
+		if (!command.compare("train")) {
 			if(argc == 8) {
-				if (train(argv[2], argv[3],atoi(argv[4]), atoi(argv[5]), argv[6], argv[7]))
+				if (train(argv[2], argv[3],
+						atoi(argv[4]), atoi(argv[5]),
+						argv[6], argv[7])) {
 					cout << "succesfull trained" << endl;
+					return 1;
+				}
 				else
 					cout << "fail training" << endl;
 			}
 			else
-				cout << "usage: RecInstruments train <sample_folder> <K> <NumSamples> <Dimensions> <out_em_fname>" << endl;
+				cout << usage_train << endl;
 		}
-		else if(command.compare("classify")) {
+		else if(!command.compare("classify")) {
+			cout << "classifying" << argv[1] <<endl;
 			if(argc == 6) {
-				if (classify(argv[2], argv[4]))
+				if (!classify(argv[2], argv[4])){
 					cout << "succesfull classified" << endl;
+					return 1;
+				}
 				else
 					cout << "fail classifying" << endl;
 			}
 			else
-				cout << "usage: RecInstruments classify <sample_folder> <K> <Dimensions> <out>" << endl;
+				cout << "usage:" << endl << usage_classify << endl;
 		}
-		return -1;
 	}
+	cout << "usage" << endl << usage_train << endl << usage_classify << endl;
+	return -1;
 }
 
 //lapadrena1_img01_inst_GTcrowd.bmp
@@ -109,6 +121,7 @@ bool train(string sample_fnames, string sample_fnames_shape,
 
 	//save EM
 	em_model->save(out_em_fname);
+	return true;
 }
 
 bool classify(string em_file, string classification_files) {
@@ -117,6 +130,6 @@ bool classify(string em_file, string classification_files) {
 //	//sample füllen
 //	Mat response = em_model->predict2( sample );
 //	float log_likelihood = response.at<double>(0,0);
-
+	return false;
 }
 
