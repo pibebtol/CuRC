@@ -7,11 +7,11 @@ using namespace cv::ml;
 using namespace std;
 using boost::format;
 
-bool train(string sample_fnames, string sample_fnames_shape,
+bool train(string sample_fnames,
 		int K, int NumSamples, string dimensions, string out_em_fname);
 bool classify(string em_file, string classification_files);
 
-string usage_train = "RecInstruments train <sample_folder> <sample_folder_shapes> <K> <NumSamples> <Dimensions> <out_em_fname>";
+string usage_train = "RecInstruments train <sample_folder> <K> <NumSamples> <Dimensions> <out_em_fname>";
 string usage_classify = "RecInstruments classify <sample_folder> <K> <Dimensions> <out>";
 
 int main(int argc, char** argv )
@@ -19,8 +19,8 @@ int main(int argc, char** argv )
 	if ( argc >= 2){
 		string command = argv[1];
 		if (!command.compare("train")) {
-			if(argc == 8) {
-				if (train(argv[2], argv[3],
+			if(argc == 7) {
+				if (train(argv[2],
 						atoi(argv[4]), atoi(argv[5]),
 						argv[6], argv[7])) {
 					cout << "succesfull trained" << endl;
@@ -30,7 +30,8 @@ int main(int argc, char** argv )
 					cout << "fail training" << endl;
 			}
 			else
-				cout << usage_train << endl;
+				cout << usage_train << endl
+				<< "number arguments got: "<< to_string(argc) << endl;
 		}
 		else if(!command.compare("classify")) {
 			cout << "classifying" << argv[1] <<endl;
@@ -51,20 +52,23 @@ int main(int argc, char** argv )
 }
 
 //lapadrena1_img01_inst_GTcrowd.bmp
-bool train(string sample_fnames, string sample_fnames_shape,
+bool train(string sample_fnames,
 		int K, int NumSamples, string dimensions, string out_em_fname) {
 	int DimSample = dimensions.length();
 	Mat labels;
 	Mat samples(NumSamples, DimSample, CV_64F);
 
 	int i = 0;
-	int row_count = 0, col_count = 0, img_count = 0;
-	string cur_sample_fname = str(boost::format(sample_fnames) % img_count);
-	string cur_sample_shape_fname = str(boost::format(sample_fnames) % img_count);
+	int row_count = 0, col_count = 0, img_count = 1;
+	stringstream ss;
+	ss << setw(2) << setfill('0') << img_count;
+	string cur_sample_fname = sample_fnames + ss.str() + ".bmp";
+	string cur_sample_shape_fname = sample_fnames + ss.str() + "_inst_GT.bmp";
+	cout << "load file " << cur_sample_fname << endl;
 	Mat img_bgr = imread(cur_sample_fname, CV_LOAD_IMAGE_COLOR);
 	Mat img_hsv;
 	cvtColor(img_bgr, img_hsv, COLOR_BGR2HSV);
-	Mat img_shape = imread(cur_sample_fname, CV_LOAD_IMAGE_COLOR);
+	Mat img_shape = imread(cur_sample_shape_fname, CV_LOAD_IMAGE_GRAYSCALE);
 
 	while(i < NumSamples) {
 		if (img_shape.at<float>(col_count, row_count) != 0) {
@@ -99,6 +103,14 @@ bool train(string sample_fnames, string sample_fnames_shape,
 				col_count = 0;
 				if (++row_count >= img_bgr.rows) {
 					row_count = 0;
+					ss << setw(2) << setfill('0') << img_count;
+					cur_sample_fname = sample_fnames + ss.str() + ".bmp";
+					cur_sample_shape_fname = sample_fnames + ss.str() + "_inst_GT.bmp";
+					cout << "load file " << cur_sample_fname << endl;
+					img_bgr = imread(cur_sample_fname, CV_LOAD_IMAGE_COLOR);
+					cvtColor(img_bgr, img_hsv, COLOR_BGR2HSV);
+					img_shape = imread(cur_sample_shape_fname, CV_LOAD_IMAGE_GRAYSCALE);
+
 					//open image
 					//open shape image
 					img_bgr = imread(cur_sample_fname, CV_LOAD_IMAGE_COLOR);
